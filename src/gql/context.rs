@@ -1,4 +1,5 @@
 impl juniper::Context for Context {}
+
 pub struct Context {}
 
 impl Context {

@@ -1,5 +1,7 @@
-use crate::gql::Context;
 use juniper::FieldResult;
+
+use crate::gql::Context;
+
 pub struct Mutation;
 
 #[derive(juniper::GraphQLInputObject)]
@@ -9,10 +11,10 @@ struct CreateUser {
 }
 
 #[juniper::object(
-    Context = Context,
+Context = Context,
 )]
 impl Mutation {
-    fn createUser(context: &Context, new_human: CreateUser) -> FieldResult<String> {
+    fn create_user(context: &Context, new_human: CreateUser) -> FieldResult<String> {
         Ok("Example Response".into())
     }
 }

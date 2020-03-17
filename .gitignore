@@ -3,3 +3,4 @@
 /.vscode/
 .idea/workspace.xml
 *.meta
+*.local.xml
