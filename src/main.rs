@@ -1,13 +1,13 @@
 // for the rocket
 #![feature(proc_macro_hygiene, decl_macro)]
 
-mod gql;
-
+use rocket::{get, post, routes};
 use rocket::response::content::Html;
 use rocket::State;
-use rocket::{get, post, routes};
 
 use crate::gql::{Context, Mutation, Query, Schema};
+
+mod gql;
 
 /// A playground for developers
 #[get("/")]

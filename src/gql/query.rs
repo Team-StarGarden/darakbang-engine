@@ -1,11 +1,12 @@
 use crate::gql::Context;
+
 pub struct Query;
 
 #[juniper::object(
-    Context = Context,
+Context = Context,
 )]
 impl Query {
-    fn apiVersion() -> &str {
+    fn api_version() -> &str {
         "1.0"
     }
 }
