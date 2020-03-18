@@ -6,3 +6,4 @@ Dockerfile
 **/*.rs.bk
 .vscode/
 .idea/
+*.env

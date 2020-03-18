@@ -8,7 +8,8 @@ edition = "2018"
 
 [dependencies]
 rocket = "0.4.4"
-diesel = "1.4.3"
+diesel = { version = "1.4.3", features = ["mysql"] }
+dotenv = "0.15.0"
 juniper = "0.14.2"
 juniper_rocket = "0.5.2"
 tokio = "0.2.13"
