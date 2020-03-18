@@ -1,7 +1,6 @@
 // for the rocket
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use]
 extern crate diesel;
 extern crate dotenv;
 
@@ -9,7 +8,6 @@ use rocket::{get, post, routes};
 use rocket::response::content::Html;
 use rocket::State;
 
-use crate::database::establish_connection;
 use crate::gql::{Context, Mutation, Query, Schema};
 
 mod gql;
