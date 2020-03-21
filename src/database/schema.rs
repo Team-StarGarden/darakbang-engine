@@ -1,8 +1,6 @@
-use diesel::table;
-
 table! {
     user (uid) {
-        uid -> VarChar,
+        uid -> Varchar,
         service_name -> Text,
         user_name -> Text,
         point -> Integer,
@@ -15,3 +13,8 @@ table! {
         pyo_je_eo -> Text,
     }
 }
+
+allow_tables_to_appear_in_same_query!(
+    user,
+    word,
+);
