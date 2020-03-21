@@ -19,4 +19,7 @@ sudo dnf install mariadb-devel
 
 # Ubuntu
 sudo apt install mariadb-dev
+
+# macOS (with Homebrew)
+brew install mariadb
 ```
