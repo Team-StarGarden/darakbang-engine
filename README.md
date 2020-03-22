@@ -2,7 +2,7 @@
 
 설명 추가 예정
 
-# Dependency
+# Dependencies
 ## Nightly Rust
 
 이 프로젝트는 [Rocket](https://github.com/SergioBenitez/Rocket/issues/19) 으로 인해 부득이하게 Nightly Rust를 사용하고 있습니다.
@@ -14,12 +14,20 @@
 다음 명령어로 설치히세요
 
 ```shell script
-# Fedora 32 이후
+# RHEL family (include CentOS, Fedora...)
 sudo dnf install mariadb-devel
 
-# Ubuntu
+# Debian family (include Ubuntu, Linux Mint...)
 sudo apt install mariadb-dev
 
 # macOS (with Homebrew)
 brew install mariadb
+```
+
+# Create Database
+
+Darakbang을 구동하기 위해서는 utf8mb4로 생성된 Database가 필요합니다.
+
+```sql
+CREATE DATABASE darakbang CHARSET utf8md4;
 ```
