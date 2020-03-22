@@ -1,11 +1,25 @@
 #!/bin/bash
 
+function set_host_db_container_address() {
+    local db_container=$(docker-compose ps | grep database | sed -E "s/\s.+//g")
+    if test -z "$db_container"; then
+        echo "Database container is not found. execute 'docker-compose build database' to create one."
+        exit 1
+    fi
+    local db_address=$(docker inspect -f '{{ range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $db_container)
+    if test -z "$db_address"; then
+        echo "Database container is not running. execute 'docker-compose start database' to run it."
+        exit 1
+    fi
+    host=$db_address
+}
+
 echo "Darakbang Engine: Database Configurator"
 echo "Copyright (c) Team StarGarden"
 echo
 
-read -p "DB Host (default: localhost): " host
-test -n "$host" || host="localhost"
+read -p "DB Host (default: database container): " host
+test -n "$host" || set_host_db_container_address
 read -p "DB User (default: darakbang): " user
 test -n "$user" || user="darakbang"
 read -p "DB Pass (default: kiwi-kawaii): " pass
