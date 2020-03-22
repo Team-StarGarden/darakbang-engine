@@ -9,7 +9,7 @@
 
 ## MariaDB Connector
 
-이 프로젝트는 [Diesel](https://diesel.rs) 로 인해 MariaDB C 컨넥터가 필요합니다.
+이 프로젝트는 [Diesel](https://diesel.rs) 로 인해 MariaDB C 커넥터가 필요합니다.
 
 다음 명령어로 설치히세요
 
@@ -19,4 +19,7 @@ sudo dnf install mariadb-devel
 
 # Ubuntu
 sudo apt install mariadb-dev
+
+# macOS (with Homebrew)
+brew install mariadb
 ```
