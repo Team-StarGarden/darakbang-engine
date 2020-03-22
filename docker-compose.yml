@@ -15,6 +15,7 @@ services:
       MYSQL_DATABASE: darakbang
       MYSQL_USER: darakbang
       MYSQL_PASSWORD: kiwi-kawaii
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
     ports:
       - "3306:3306"
     volumes:
