@@ -6,12 +6,12 @@ echo
 
 read -p "DB Host (default: localhost): " host
 test -n "$host" || host="localhost"
-read -p "DB User (default: root): " user
-test -n "$user" || user="root"
+read -p "DB User (default: darakbang): " user
+test -n "$user" || user="darakbang"
 read -p "DB Pass (default: kiwi-kawaii): " pass
 test -n "$pass" || pass="kiwi-kawaii"
-read -p "DB Name (default: darakbang.engine): " dbname
-test -n "$dbname" || dbname="darakbang.engine"
+read -p "DB Name (default: darakbang): " dbname
+test -n "$dbname" || dbname="darakbang"
 
 echo "DATABASE_URL=mysql://${user}:${pass}@${host}/${dbname}" > .env
 echo >> .env
