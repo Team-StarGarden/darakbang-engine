@@ -7,13 +7,12 @@ use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use diesel::result::ConnectionError;
 
-use dotenv::{dotenv, Error as DotenvError};
+use dotenv::dotenv;
 
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum DatabaseConnectionError {
-    DotenvError(DotenvError),
     DatabaseUrlInvalid(VarError),
     MysqlConnectionError(ConnectionError),
 }
@@ -21,7 +20,6 @@ pub enum DatabaseConnectionError {
 impl fmt::Display for DatabaseConnectionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            DatabaseConnectionError::DotenvError(e) => write!(f, "DotenvError({:?})", e),
             DatabaseConnectionError::DatabaseUrlInvalid(e) => write!(f, "DotenvError({:?})", e),
             DatabaseConnectionError::MysqlConnectionError(e) => write!(f, "DotenvError({:?})", e),
         }
@@ -29,7 +27,7 @@ impl fmt::Display for DatabaseConnectionError {
 }
 
 pub fn establish_connection() -> Result<MysqlConnection, DatabaseConnectionError> {
-    dotenv().map_err(DatabaseConnectionError::DotenvError)?;
+    dotenv().ok();
 
     let database_url =
         env::var("DATABASE_URL").map_err(DatabaseConnectionError::DatabaseUrlInvalid)?;
