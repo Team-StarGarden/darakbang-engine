@@ -7,12 +7,14 @@ services:
     links:
       - database
     environment:
-      DATABASE_URL: mysql://root:kiwi-kawaii@mysql/darakbang.engine
+      DATABASE_URL: mysql://darakbang:kiwi-kawaii@mysql/darakbang
   database:
-    image: mysql
+    image: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: kiwi-kawaii
+      MYSQL_DATABASE: darakbang
+      MYSQL_USER: darakbang
+      MYSQL_PASSWORD: kiwi-kawaii
     ports:
       - "3306:3306"
     volumes:
