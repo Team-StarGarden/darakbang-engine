@@ -1,17 +1,18 @@
 // for the rocket
 #![feature(proc_macro_hygiene, decl_macro)]
 
+#[macro_use]
 extern crate diesel;
 extern crate dotenv;
 
-use rocket::{get, post, routes};
 use rocket::response::content::Html;
 use rocket::State;
+use rocket::{get, post, routes};
 
 use crate::gql::{Context, Mutation, Query, Schema};
 
-mod gql;
 mod database;
+mod gql;
 
 /// A playground for developers
 #[get("/")]
@@ -40,7 +41,7 @@ fn post_graphql_handler(
 }
 
 fn main() {
-    database::establish_connection();
+    database::establish_connection().expect("Invalid database configuration detected");
     rocket::ignite()
         .manage(Context::new())
         .manage(Schema::new(Query, Mutation))

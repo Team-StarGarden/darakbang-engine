@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  server:
+    build: .
+    ports:
+      - "80:80"
+    links:
+      - database
+    environment:
+      DATABASE_URL: mysql://darakbang:kiwi-kawaii@mysql/darakbang
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: darakbang
+      MYSQL_USER: darakbang
+      MYSQL_PASSWORD: kiwi-kawaii
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+volumes:
+  mysql-data: {}
