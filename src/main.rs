@@ -3,7 +3,6 @@
 
 #[macro_use]
 extern crate diesel;
-extern crate dotenv;
 
 use rocket::response::content::Html;
 use rocket::State;
@@ -11,6 +10,7 @@ use rocket::{get, post, routes};
 
 use crate::gql::{Context, Mutation, Query, Schema};
 
+mod config;
 mod database;
 mod gql;
 
@@ -41,7 +41,9 @@ fn post_graphql_handler(
 }
 
 fn main() {
-    database::establish_connection().expect("Invalid database configuration detected");
+    let configuration = config::Config::load().expect("Invalid configuration detected");
+
+    database::establish_connection(&configuration.database).expect("Invalid database configuration detected");
     rocket::ignite()
         .manage(Context::new())
         .manage(Schema::new(Query, Mutation))
