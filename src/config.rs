@@ -25,13 +25,19 @@ impl ConfigError {
     }
 }
 
+macro_rules! try_get_var {
+    ($key:literal) => {
+        var($key).map_err(|e| ConfigError::from_var_error($key, e))?
+    };
+}
+
 pub struct Database {
     pub url: String,
 }
 
 impl Database {
     fn from_env() -> Result<Self, ConfigError> {
-        let url = var("DATABASE_URL").map_err(|e| ConfigError::from_var_error("DATABASE_URL", e))?;
+        let url = try_get_var!("DATABASE_URL");
         
         Ok(Self {
             url,
