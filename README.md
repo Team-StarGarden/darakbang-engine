@@ -41,5 +41,5 @@ brew install mariadb
 Darakbang을 구동하기 위해서는 utf8mb4로 생성된 Database가 필요합니다.
 
 ```sql
-CREATE DATABASE darakbang CHARSET utf8md4;
+CREATE DATABASE darakbang CHARSET utf8mb4;
 ```

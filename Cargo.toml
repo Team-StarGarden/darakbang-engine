@@ -1,7 +1,7 @@
 [package]
 name = "darakbang-engine"
 version = "0.0.1"
-authors = [ "Alex4386 <psh010209@gmail.com>", "RanolP <public.ranolp@gmail.com>", "SLoWMoTIoN <admin@slowmotion.dev>" ]
+authors = [ "Alex4386 <psh010209@gmail.com>", "RanolP <public.ranolp@gmail.com>", "SLoWMoTIoN <admin@slowmotion.dev>", "kiwiyou <kiwiyou.dev@gmail.com>" ]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
