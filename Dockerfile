@@ -3,7 +3,16 @@ FROM rust as builder
 RUN rustup default nightly
 
 WORKDIR /usr/src/darakbang-engine
-COPY . .
+
+COPY Cargo.lock .
+COPY Cargo.toml .
+
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm src/main.rs
+
+COPY src src
 RUN cargo install --path .
 
 FROM debian:stable-slim
