@@ -46,7 +46,8 @@ impl Database {
 }
 
 pub struct Config {
-    pub database: Database
+    pub database: Database,
+    pub bind_address: String,
 }
 
 impl Config {
@@ -55,8 +56,11 @@ impl Config {
 
         let database = Database::from_env()?;
 
+        let bind_address = var("BIND_ADDRESS").unwrap_or("0.0.0.0:8080".to_owned());
+
         Ok(Self {
             database,
+            bind_address,
         })
     }
 }
