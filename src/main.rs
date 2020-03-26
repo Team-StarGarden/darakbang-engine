@@ -54,12 +54,12 @@ fn render_404<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerRespons
 async fn main() -> io::Result<()> {
     let configuration = config::Config::load().expect("Invalid configuration detected");
 
-    let connection = database::establish_connection(&configuration.database)
+    let pool = database::establish_connection(&configuration.database)
         .expect("Invalid database configuration detected");
 
     log::setup_logger().expect("Logger setup failed");
 
-    let context = Arc::new(Context::new(connection));
+    let context = Arc::new(Context::new(pool));
     let schema = Arc::new(Schema::new(Query, Mutation));
 
     HttpServer::new(move || {
