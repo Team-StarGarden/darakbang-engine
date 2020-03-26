@@ -2,33 +2,42 @@ use chrono::Local;
 use colored::*;
 use log::{Level, LevelFilter};
 
+fn logger_icon<'a>(debug: &'a str, release: &'a str) -> &'a str {
+    if !cfg!(feature = "debug") {
+        debug
+    } else {
+        release
+    }
+}
+
 pub fn setup_logger() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
                 "{time} {level} {target} {arrow} {message}",
                 time = Local::now()
-                    .format("[%+]")
+                    .format("%+\t")
                     .to_string()
                     .bright_black(),
                 level = {
                     let (color, icon, label) = match record.level() {
-                        Level::Info => (Color::Blue, "i", "info"),
-                        Level::Warn => (Color::Yellow, "⚠", "warning"),
-                        Level::Error => (Color::Red, "✖", "error"),
-                        Level::Debug => (Color::Blue, "●", "debug"),
-                        Level::Trace => (Color::Magenta, "…", "trace"),
+                        Level::Info => (Color::Blue, logger_icon("i", "I"), "info"),
+                        Level::Warn => (Color::Yellow, logger_icon("⚠", "W"), "warning"),
+                        Level::Error => (Color::Red, logger_icon("✖", "E"), "error"),
+                        Level::Debug => (Color::Blue, logger_icon("●", "D"), "debug"),
+                        Level::Trace => (Color::Magenta, logger_icon("…", "T"), "trace"),
                     };
                     format!(
-                        "{icon} {label}{margin} ",
-                        icon = icon.color(color),
-                        label = label.underline().color(color),
-                        // max length of label is 7 (warning)
-                        margin = " ".repeat(7 - label.len())
+                        "{} {: <7} ",
+                        icon.color(color),
+                        label.underline().color(color),
                     )
                 },
-                target = format!("[{}]", record.target().bright_black()),
-                arrow = "›".bright_black(),
+                target = {
+                    let target: Vec<&str> = record.target().split(":").collect();
+                    format!("{: <10} ", target.last().unwrap().bright_black())
+                },
+                arrow = logger_icon("›", "->").bright_black(),
                 message = message
             ))
         })
