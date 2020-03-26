@@ -1,13 +1,13 @@
 use diesel::mysql::MysqlConnection;
-use diesel::prelude::*;
-use diesel::result::ConnectionError;
+use diesel::r2d2::{Pool, PooledConnection, ConnectionManager, PoolError};
 
 use crate::config;
 
-pub fn establish_connection(config: &config::Database) -> Result<MysqlConnection, ConnectionError> {
+pub type MysqlPool = Pool<ConnectionManager<MysqlConnection>>;
+pub type MysqlPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
+
+pub fn establish_connection(config: &config::Database) -> Result<MysqlPool, PoolError> {
     let database_url = &config.url;
-    if cfg!(feature = "debug") {
-        dbg!(database_url);
-    }
-    MysqlConnection::establish(database_url)
+    let manager = ConnectionManager::new(database_url);
+    Pool::builder().build(manager)
 }
