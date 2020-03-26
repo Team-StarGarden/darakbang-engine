@@ -18,8 +18,9 @@ pub struct NewUser {
     uid: String,    
     service_name: String,
     user_name: String,
-    password: Vec<u8>,
-    salt: String,
+    point: i32,
+    password: Option<Vec<u8>>,
+    salt: Option<String>,
 }
 
 impl NewUser {
@@ -28,8 +29,9 @@ impl NewUser {
             uid: user_name.clone(),
             service_name: "local".into(),
             user_name,
-            password: password.to_vec(),
-            salt
+            point: 0,
+            password: Some(password.to_vec()),
+            salt: Some(salt),
         }
     }
 
@@ -38,8 +40,9 @@ impl NewUser {
             uid,
             service_name,
             user_name,
-            password: Vec::new(),
-            salt: String::new(),
+            point: 0,
+            password: None,
+            salt: None,
         }
     }
 }
