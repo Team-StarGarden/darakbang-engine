@@ -1,18 +1,16 @@
-// for the rocket
-#![feature(proc_macro_hygiene, decl_macro)]
-
 #[macro_use]
 extern crate diesel;
 
-use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
-
-use crate::gql::{Context, Mutation, Query, Schema};
-use actix_rt;
-use actix_web::middleware::errhandlers::ErrorHandlers;
-use juniper::http::{playground::playground_source, GraphQLRequest};
-use middleware::errhandlers::ErrorHandlerResponse;
 use std::io;
 use std::sync::Arc;
+
+use actix_rt;
+use actix_web::{App, dev, Error, http, HttpResponse, HttpServer, middleware, Responder, web};
+use actix_web::middleware::errhandlers::ErrorHandlers;
+use juniper::http::{GraphQLRequest, playground::playground_source};
+use middleware::errhandlers::ErrorHandlerResponse;
+
+use crate::gql::{Context, Mutation, Query, Schema};
 
 mod config;
 mod database;
