@@ -5,9 +5,9 @@ use std::io;
 use std::sync::Arc;
 
 use actix_rt;
-use actix_web::{App, dev, Error, http, HttpResponse, HttpServer, middleware, Responder, web};
 use actix_web::middleware::errhandlers::ErrorHandlers;
-use juniper::http::{GraphQLRequest, playground::playground_source};
+use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
+use juniper::http::{playground::playground_source, GraphQLRequest};
 use middleware::errhandlers::ErrorHandlerResponse;
 
 use crate::gql::{Context, Mutation, Query, Schema};
@@ -54,12 +54,12 @@ fn render_404<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerRespons
 async fn main() -> io::Result<()> {
     let configuration = config::Config::load().expect("Invalid configuration detected");
 
-    database::establish_connection(&configuration.database)
+    let connection = database::establish_connection(&configuration.database)
         .expect("Invalid database configuration detected");
 
     log::setup_logger().expect("Logger setup failed");
 
-    let context = Arc::new(Context::new());
+    let context = Arc::new(Context::new(connection));
     let schema = Arc::new(Schema::new(Query, Mutation));
 
     HttpServer::new(move || {
