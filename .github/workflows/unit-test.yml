@@ -12,8 +12,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - name: Use Rust nightly
-        run: rustup default nightly
+      - name: Use Recent Rust
+        run: rustup update
       - uses: actions/checkout@v2
       - name: Cache cargo registry
         uses: actions/cache@v1

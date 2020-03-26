@@ -1,7 +1,5 @@
 FROM rust as builder
 
-RUN rustup default nightly
-
 WORKDIR /usr/src/darakbang-engine
 
 COPY Cargo.lock .
