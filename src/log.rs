@@ -6,13 +6,11 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
-                "{time} {target} {arrow} {level} {message}",
+                "{time} {level} {target} {arrow} {message}",
                 time = Local::now()
-                    .format("[%Y-%m-%d] [%H:%M:%S]")
+                    .format("[%+]")
                     .to_string()
                     .bright_black(),
-                target = format!("[{}]", record.target().bright_black()),
-                arrow = "›".bright_black(),
                 level = {
                     let (color, icon, label) = match record.level() {
                         Level::Info => (Color::Blue, "i", "info"),
@@ -29,6 +27,8 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
                         margin = " ".repeat(7 - label.len())
                     )
                 },
+                target = format!("[{}]", record.target().bright_black()),
+                arrow = "›".bright_black(),
                 message = message
             ))
         })
