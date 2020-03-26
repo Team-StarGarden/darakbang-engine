@@ -1,16 +1,19 @@
 # Windows MariaDB Connector
 
-> Windows 10 20H1(2004), Rust Nightly 2020년 3월 22일 버전으로 테스트 하였습니다.
+## MSVC ABI
 
-# Install libmysqlclient via Vcpkg
+> ❌ MSVC ABI에서는 현재 지원하지 않습니다. GNU ABI가 필요합니다.
 
-1. [Vcpkg 레포지토리](https://github.com/microsoft/vcpkg)의 readme를 읽고 설치합니다.
-2. 환경 변수를 설정합니다.
-    * (선택) ```PATH```에 ```vcpkg를 설치한 경로```를 추가합니다.
-    * ```VCPKG_ROOT```의 값으로 ```vcpkg를 설치한 경로```로 설정합니다.
-    * ```RUSTFLAGS의``` 값으로 ```-Ctarget-feature=+crt-static```로 설정합니다.
-    * ```VCPKGRS_DYNAMIC```의 값으로 ```1```로 설정합니다.
-3. ```vcpkg install libmysql:x64-windows```를 실행합니다.
-    * i7-7700을 기준으로 약 42분 정도 소요됩니다.
-4. ```vcpkg intergrate install```을 실행합니다.
-    * 관리자 권한이 필요할 수 있습니다.
+## GNU ABI
+
+> Windows 10 20H1 (2004), Rust 1.42,
+> MySQL 5.7, MariaDB 10.4 에서 테스트하였습니다.
+
+1. MySQL 5.7을 설치합니다.
+    * 실제 DBMS는 MariaDB 이므로 MySQL 서비스를 등록할 필요가 없습니다.
+2. ```MYSQLCLIENT_LIB_DIR``` 환경 변수를 설정합니다.
+    * 64비트 환경에서는 기본적으로 ```C:\Program Files\MySQL\MySQL Server 5.7\lib```입니다.
+    * ```libmysql.dll```, ```libmysql.lib```, ```mysqlclient.lib``` 세 파일이 있으면 됩니다.
+3. 빌드하고 실행해 봅니다.
+    * ```cargo run```
+4. ```libmysql.dll```을 찾지 못할 때에는 해당 파일을 ```C:\Windows\System32```에 복사 한 후 다시 시도해 봅니다.
