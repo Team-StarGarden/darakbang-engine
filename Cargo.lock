@@ -511,6 +511,7 @@ dependencies = [
  "fern",
  "juniper",
  "log",
+ "rand",
  "serde",
  "serde_json",
  "tokio",

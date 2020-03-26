@@ -10,11 +10,30 @@ pub fn create_user(
     service_name: String,
     user_name: String,
 ) -> QueryResult<User> {
-    let new_user = NewUser {
-        uid,
-        service_name,
-        user_name,
-    };
+    let new_user = NewUser::new_oauth(uid, service_name, user_name);
+    {
+        use crate::database::schema::user::dsl::*;
+
+        diesel::insert_into(user).values(&new_user).execute(conn)?;
+
+        user.find(uid).get_result(conn)
+    }
+}
+
+pub fn create_local_user(
+    conn: &MysqlConnection,
+    user_name: String,
+    password: &str,
+) -> QueryResult<User> {
+    use rand::{distributions::Alphanumeric, Rng};
+
+    let salt = rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(8)
+        .collect::<String>();
+    let password_hash = argon2rs::argon2i_simple(password, &salt);
+    
+    let new_user = NewUser::new_local(user_name, password_hash, salt);
     {
         use crate::database::schema::user::dsl::*;
 
@@ -39,7 +58,7 @@ pub fn find_local_user(
         .optional()?
         .flatten()
         .into();
-        
+
     if let Some(salt) = salt.as_ref() {
         let password_hash = Zeroizing::new(argon2rs::argon2i_simple(password, salt));
         let result = user
