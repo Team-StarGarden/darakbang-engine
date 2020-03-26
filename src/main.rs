@@ -16,6 +16,8 @@ mod config;
 mod database;
 mod gql;
 mod log;
+mod protocol;
+mod websocket;
 
 /// A playground for developers
 async fn playground() -> impl Responder {
@@ -71,6 +73,7 @@ async fn main() -> io::Result<()> {
             .service(web::resource("/graphql").route(web::post().to(graphql)))
             .service(web::resource("/graphql").route(web::get().to(graphql)))
             .service(web::resource("/").route(web::get().to(playground)))
+            .service(web::resource("/ws").to(websocket::ws))
     })
     .bind(&configuration.bind_address)?
     .run()
