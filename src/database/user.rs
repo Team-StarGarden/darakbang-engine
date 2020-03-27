@@ -42,13 +42,14 @@ pub fn create_local_user(
         .collect::<String>();
     let password_hash = argon2rs::argon2i_simple(password, &salt);
 
+    let new_user_name = user_name.clone();
     let new_user = NewUser::new_local(user_name, password_hash, salt);
     {
         use crate::database::schema::user::dsl::*;
 
         diesel::insert_into(user).values(&new_user).execute(conn)?;
 
-        user.find(uid).select((uid, service_name, user_name, point)).get_result(conn)
+        user.filter(user_name.eq(new_user_name)).select((uid, service_name, user_name, point)).get_result(conn)
     }
 }
 
