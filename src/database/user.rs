@@ -1,8 +1,16 @@
-use crate::database::model::{NewUser, User};
-use crate::diesel::RunQueryDsl;
+use diesel::{ExpressionMethods, OptionalExtension, QueryDsl};
 use diesel::mysql::MysqlConnection;
 use diesel::result::QueryResult;
-use diesel::{ExpressionMethods, OptionalExtension, QueryDsl};
+
+use crate::database::model::{NewUser, User};
+use crate::diesel::RunQueryDsl;
+
+pub fn get_all_users(
+    conn: &MysqlConnection,
+) -> QueryResult<User> {
+    use crate::database::schema::user::dsl;
+    dsl::user.get_result(conn)
+}
 
 pub fn create_user(
     conn: &MysqlConnection,
@@ -32,7 +40,7 @@ pub fn create_local_user(
         .take(8)
         .collect::<String>();
     let password_hash = argon2rs::argon2i_simple(password, &salt);
-    
+
     let new_user = NewUser::new_local(user_name, password_hash, salt);
     {
         use crate::database::schema::user::dsl::*;

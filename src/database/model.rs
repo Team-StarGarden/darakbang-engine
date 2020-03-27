@@ -1,3 +1,6 @@
+use diesel::backend::Backend;
+use diesel::deserialize::Queryable;
+
 use crate::database::schema::user;
 
 #[derive(Queryable)]
@@ -15,7 +18,7 @@ pub struct User {
 #[derive(Insertable)]
 #[table_name = "user"]
 pub struct NewUser {
-    uid: String,    
+    uid: String,
     service_name: String,
     user_name: String,
     point: i32,
@@ -54,9 +57,6 @@ pub struct Word {
     pub user_name: String,
     pub point: u32,
 }
-
-use diesel::backend::Backend;
-use diesel::deserialize::Queryable;
 
 /// Represents a column which should not be serialized
 pub struct HiddenColumn<T> {

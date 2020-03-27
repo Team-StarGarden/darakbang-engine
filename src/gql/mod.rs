@@ -4,6 +4,7 @@ pub use query::Query;
 
 mod context;
 mod mutation;
+mod schema;
 mod query;
 
 pub type Schema = juniper::RootNode<'static, Query, Mutation>;
