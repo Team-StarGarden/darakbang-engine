@@ -7,9 +7,10 @@ use crate::diesel::RunQueryDsl;
 
 pub fn get_all_users(
     conn: &MysqlConnection,
-) -> QueryResult<User> {
-    use crate::database::schema::user::dsl;
-    dsl::user.get_result(conn)
+) -> QueryResult<Vec<User>> {
+    use crate::database::schema::user::dsl::*;
+    
+    user.select((uid, service_name, user_name, point)).load(conn)
 }
 
 pub fn create_user(
@@ -24,7 +25,7 @@ pub fn create_user(
 
         diesel::insert_into(user).values(&new_user).execute(conn)?;
 
-        user.find(uid).get_result(conn)
+        user.find(uid).select((uid, service_name, user_name, point)).get_result(conn)
     }
 }
 
@@ -47,7 +48,7 @@ pub fn create_local_user(
 
         diesel::insert_into(user).values(&new_user).execute(conn)?;
 
-        user.find(uid).get_result(conn)
+        user.find(uid).select((uid, service_name, user_name, point)).get_result(conn)
     }
 }
 
@@ -73,6 +74,7 @@ pub fn find_local_user(
             .filter(dsl::user_name.eq(user_name))
             .filter(dsl::salt.eq(salt))
             .filter(dsl::password.eq(Some(password_hash.as_ref())))
+            .select((dsl::uid, dsl::service_name, dsl::user_name, dsl::point))
             .first(conn)
             .optional()?;
         Ok(result)
