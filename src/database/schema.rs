@@ -21,6 +21,8 @@ table! {
         service_name -> Text,
         user_name -> Text,
         point -> Integer,
+        password -> Nullable<Binary>,
+        salt -> Nullable<Char>,
     }
 }
 
