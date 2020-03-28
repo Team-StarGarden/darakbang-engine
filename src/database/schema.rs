@@ -1,4 +1,21 @@
 table! {
+    original_language_word (id) {
+        id -> Integer,
+        word_id -> Integer,
+        language -> Varchar,
+        original -> Text,
+    }
+}
+
+table! {
+    region_word (id) {
+        id -> Integer,
+        word_id -> Integer,
+        region -> Varchar,
+    }
+}
+
+table! {
     user (uid) {
         uid -> Varchar,
         service_name -> Text,
@@ -10,11 +27,22 @@ table! {
 table! {
     word (id) {
         id -> Integer,
-        pyo_je_eo -> Text,
+        pyo_je_eo -> Mediumtext,
+        group_code -> Integer,
+        group_order -> Integer,
+        word_unit -> Varchar,
+        word_type -> Varchar,
+        category -> Nullable<Varchar>,
+        definition -> Text,
+        position -> Nullable<Varchar>,
+        sense_type -> Varchar,
+        space -> Varchar,
     }
 }
 
 allow_tables_to_appear_in_same_query!(
+    original_language_word,
+    region_word,
     user,
     word,
 );
