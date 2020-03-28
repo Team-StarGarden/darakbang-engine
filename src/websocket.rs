@@ -2,7 +2,7 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use crate::protocol::Packet;
+use crate::protocol::{PacketClient, PacketServer};
 use log::{info, warn};
 use std::time::{Duration, Instant};
 
@@ -50,12 +50,13 @@ impl Actor for WsSession {
     }
 }
 
-impl<T: Packet> Handler<T> for WsSession {
+impl Handler<PacketServer> for WsSession {
     type Result = ();
 
-    fn handle(&mut self, packet: T, ctx: &mut Self::Context) {
-        // ctx.binary(serde_json::to_vec(&packet).unwrap());
-        ctx.binary("Test");
+    fn handle(&mut self, packet: PacketServer, ctx: &mut Self::Context) {
+        ctx.text(
+            serde_json::to_string(&packet).expect("serializing PacketServer should never fail"),
+        )
     }
 }
 
