@@ -29,7 +29,7 @@ table! {
 table! {
     word (id) {
         id -> Integer,
-        pyo_je_eo -> Text,
+        lemma -> Varchar,
         group_code -> Integer,
         group_order -> Integer,
         word_unit -> Varchar,

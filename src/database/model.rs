@@ -47,7 +47,7 @@ impl NewUser {
 #[table_name = "word"]
 pub struct Word {
     pub id: i32,
-    pub pyo_je_eo: String,
+    pub lemma: String,
     pub group_code: i32,
     pub group_order: i32,
     pub word_unit: String,
