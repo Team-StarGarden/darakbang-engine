@@ -11,7 +11,7 @@ pub enum PacketResult<OkBody: Serialize, ErrorKind: Serialize> {
     },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 #[serde(untagged)]
 pub enum PacketServer {
     Common(CommonPacketServer),
@@ -21,7 +21,7 @@ impl Message for PacketServer {
     type Result = ();
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 #[serde(untagged)]
 pub enum PacketClient {
     Common(CommonPacketClient),
