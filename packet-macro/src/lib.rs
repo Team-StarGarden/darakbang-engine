@@ -92,7 +92,8 @@ pub fn packet(args: TokenStream, item: TokenStream) -> TokenStream {
                 #(#attrs)*
                 #[serde(rename = #rename)]
                 #name {
-                    body: #unnamed
+                    ok: bool,
+                    body: #unnamed,
                 }
             }),
             Fields::Unit => {
@@ -111,12 +112,12 @@ pub fn packet(args: TokenStream, item: TokenStream) -> TokenStream {
     let generics = item.generics;
 
     (quote! {
-        #[derive(serde::Serialize, serde::Deserialize)]
+        #[derive(serde::Serialize)]
         #[serde(tag = "kind")]
         #vis enum #server_name #generics {
             #(#variant_generated_server,)*
         }
-        #[derive(serde::Serialize, serde::Deserialize)]
+        #[derive(serde::Deserialize)]
         #[serde(tag = "kind")]
         #vis enum #client_name #generics {
             #(#variant_generated_client,)*
