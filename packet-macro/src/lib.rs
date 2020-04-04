@@ -110,15 +110,25 @@ pub fn packet(args: TokenStream, item: TokenStream) -> TokenStream {
     let server_name = format_ident!("{}Server", name);
     let client_name = format_ident!("{}Client", name);
     let generics = item.generics;
+    let attrs: Vec<_> = item
+        .attrs
+        .iter()
+        .filter(|it| match it.path.get_ident() {
+            Some(v) if v.to_string() == "packet" => false,
+            _ => true,
+        })
+        .collect();
 
     (quote! {
         #[derive(serde::Serialize)]
         #[serde(tag = "kind")]
+        #(#attrs)*
         #vis enum #server_name #generics {
             #(#variant_generated_server,)*
         }
         #[derive(serde::Deserialize)]
         #[serde(tag = "kind")]
+        #(#attrs)*
         #vis enum #client_name #generics {
             #(#variant_generated_client,)*
         }
