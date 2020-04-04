@@ -13,6 +13,7 @@ use middleware::errhandlers::ErrorHandlerResponse;
 use crate::gql::{Context, Mutation, Query, Schema};
 
 mod config;
+mod core;
 mod database;
 mod gql;
 mod log;

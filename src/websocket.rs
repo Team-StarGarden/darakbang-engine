@@ -2,6 +2,7 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
+use crate::core::UserId;
 use crate::protocol::{PacketClient, PacketServer};
 use log::{info, warn};
 use std::time::{Duration, Instant};
@@ -9,7 +10,6 @@ use std::time::{Duration, Instant};
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
-type UserId = usize;
 type Message = Vec<u8>;
 
 struct WsSession {
