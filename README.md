@@ -32,10 +32,20 @@ brew install mariadb
 
 [여기](docs/windows-build.md)를 참조하세요.
 
-# Create Database
+# Prepare Database
 
-Darakbang을 구동하기 위해서는 utf8mb4로 생성된 Database가 필요합니다.
+## Create Database
+
+utf8mb4로 생성된 DB를 생성합니다.
 
 ```sql
 CREATE DATABASE darakbang CHARSET utf8mb4;
+```
+
+## Import words
+
+단어 데이터를 임포트 합니다.
+
+```shell script
+mysql -u (DB 사용자) -p darakbang < ./dump.sql
 ```
