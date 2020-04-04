@@ -4,6 +4,7 @@ extern crate diesel;
 use std::io;
 use std::sync::Arc;
 
+use actix::prelude::*;
 use actix_rt;
 use actix_web::middleware::errhandlers::ErrorHandlers;
 use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
@@ -66,7 +67,7 @@ async fn main() -> io::Result<()> {
     let context = Arc::new(Context::new(pool));
     let schema = Arc::new(Schema::new(Query, Mutation));
 
-    let server = Server::default();
+    let server = Server::default().start();
 
     HttpServer::new(move || {
         App::new()

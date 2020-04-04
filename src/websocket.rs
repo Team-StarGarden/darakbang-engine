@@ -4,13 +4,11 @@ use actix_web_actors::ws;
 
 use crate::core::{Server, UserId};
 use crate::protocol::{PacketClient, PacketServer};
-use log::{info, warn};
+use log::{info, trace, warn};
 use std::time::{Duration, Instant};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
-
-type Message = Vec<u8>;
 
 struct WsSession {
     id: UserId,
@@ -81,7 +79,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                 ctx.stop();
             }
             ws::Message::Text(text) => {
-                if let Ok(message) = serde_json::from_str::<Message>(&text) {
+                trace!("{}", &text);
+                if let Ok(message) = serde_json::from_str::<PacketClient>(&text) {
+                    info!("{:?}", message);
+                    // self.server.do_send(message);
                     /*
                     match message {
                         Message::Chat { text, to } => {
@@ -107,10 +108,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                     */
                 }
             }
-            ws::Message::Nop => (),
-            ws::Message::Continuation(_) => {
-                // wtf is that
-            }
+            ws::Message::Nop | ws::Message::Continuation(_) => {}
         }
     }
 }
