@@ -1,5 +1,20 @@
-use serde::Serialize;
+use crate::protocol::PacketResult;
+use serde::*;
 
-pub struct GotoPacketRequest {}
+#[derive(Serialize, Deserialize)]
+pub struct GotoPacketRequest {
+    // game_category: Option<GameCategory>,
+// room: Option<RoomId>,
+}
 
-pub struct GotoPacketResponse {}
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum GotoPacketResponseError {
+    IsRoomFull,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GotoPacketResponseOk {}
+
+pub type GotoPacketResponse = PacketResult<GotoPacketResponseOk, GotoPacketResponseError>;

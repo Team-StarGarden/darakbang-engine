@@ -1,5 +1,12 @@
-use crate::packet_kind_child;
+use packet_macro::packet;
 
 mod goto;
 
-packet_kind_child!(CommonPacketKind, "common", { Goto("goto") });
+#[packet(namespace = "common")]
+pub enum CommonPacket {
+    #[packet(id = "goto")]
+    Goto {
+        request: goto::GotoPacketRequest,
+        response: goto::GotoPacketResponse,
+    },
+}

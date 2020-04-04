@@ -21,6 +21,7 @@ chrono = "0.4.11"
 colored = "1.9.3"
 actix-web-actors = "2.0.0"
 actix = "0.9.0"
+packet-macro = { path = "./packet-macro" }
 argon2rs = "0.2.5"
 zeroize = "1.1.0"
 rand = "0.7.3"

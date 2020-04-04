@@ -1,7 +1,7 @@
-use crate::protocol::packet_kind::PacketKind;
-use serde::Serialize;
-
-#[derive(Serialize)]
+use crate::protocol::structure::*;
+use actix::Message;
+use serde::*;
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum PacketResult<OkBody: Serialize, ErrorKind: Serialize> {
     Ok(OkBody),
@@ -12,8 +12,21 @@ pub enum PacketResult<OkBody: Serialize, ErrorKind: Serialize> {
 }
 
 #[derive(Serialize)]
-pub struct ServerPacket<OkBody: Serialize, ErrorKind: Serialize> {
-    ok: bool,
-    kind: PacketKind,
-    body: PacketResult<OkBody, ErrorKind>,
+#[serde(untagged)]
+pub enum PacketServer {
+    Common(CommonPacketServer),
+}
+
+impl Message for PacketServer {
+    type Result = ();
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum PacketClient {
+    Common(CommonPacketClient),
+}
+
+impl Message for PacketClient {
+    type Result = ();
 }
