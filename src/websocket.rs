@@ -2,7 +2,7 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use crate::core::UserId;
+use crate::core::{Server, UserId};
 use crate::protocol::{PacketClient, PacketServer};
 use log::{info, warn};
 use std::time::{Duration, Instant};
@@ -15,7 +15,7 @@ type Message = Vec<u8>;
 struct WsSession {
     id: UserId,
     last_heartbeat: Instant,
-    // host: Addr<game::Host>,
+    server: Addr<Server>,
 }
 
 impl Actor for WsSession {
@@ -134,13 +134,13 @@ impl WsSession {
 pub async fn ws(
     req: HttpRequest,
     stream: web::Payload,
-    // server: web::Data<Addr<game::Host>>,
+    server: web::Data<Addr<Server>>,
 ) -> Result<HttpResponse, Error> {
     ws::start(
         WsSession {
             id: 0,
             last_heartbeat: Instant::now(),
-            // host: server.get_ref().clone(),
+            server: server.as_ref().clone(),
         },
         &req,
         stream,

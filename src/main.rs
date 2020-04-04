@@ -10,6 +10,7 @@ use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer
 use juniper::http::{playground::playground_source, GraphQLRequest};
 use middleware::errhandlers::ErrorHandlerResponse;
 
+use crate::core::Server;
 use crate::gql::{Context, Mutation, Query, Schema};
 
 mod config;
@@ -65,10 +66,13 @@ async fn main() -> io::Result<()> {
     let context = Arc::new(Context::new(pool));
     let schema = Arc::new(Schema::new(Query, Mutation));
 
+    let server = Server::default();
+
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
             .data(context.clone())
+            .data(server.clone())
             .wrap(middleware::Logger::default())
             .wrap(ErrorHandlers::new().handler(http::StatusCode::NOT_FOUND, render_404))
             .service(web::resource("/graphql").route(web::post().to(graphql)))
