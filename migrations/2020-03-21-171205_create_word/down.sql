@@ -1,1 +1,1 @@
-DROP TABLE `id`
+DROP TABLE `word`

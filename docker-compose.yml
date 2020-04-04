@@ -21,5 +21,6 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql-config:/etc/mysql/conf.d
 volumes:
   mysql-data: {}
