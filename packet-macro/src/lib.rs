@@ -148,7 +148,7 @@ pub fn packet(args: TokenStream, item: TokenStream) -> TokenStream {
         #vis enum #client_name #generics {
             #(#variant_generated_client,)*
         }
-        impl Message for #client_name {
+        impl actix::Message for #client_name {
             type Result = #server_name;
         }
 
