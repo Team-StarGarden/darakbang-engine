@@ -2,7 +2,7 @@ use crate::core::{Room, RoomId, Session, UserId};
 use actix::prelude::*;
 use std::collections::HashMap;
 
-#[derive(Clone, Default)]
+#[derive(Default)]
 pub struct Server {
     sessions: HashMap<UserId, Session>,
     rooms: HashMap<RoomId, Room>,
