@@ -1,5 +1,5 @@
 use crate::core::Server;
-use crate::protocol::structure::*;
+use crate::protocol::*;
 use actix::prelude::*;
 use serde::*;
 
