@@ -1,13 +1,12 @@
-use crate::core::{Room, RoomId, Session, UserId};
+use crate::core::{Room, RoomId};
 use actix::prelude::*;
 use std::collections::HashMap;
 
 #[derive(Default)]
-pub struct Server {
-    sessions: HashMap<UserId, Session>,
+pub struct RoomManager {
     rooms: HashMap<RoomId, Room>,
 }
 
-impl Actor for Server {
+impl Actor for RoomManager {
     type Context = Context<Self>;
 }

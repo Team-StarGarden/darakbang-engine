@@ -2,7 +2,7 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use crate::core::{Server, UserId};
+use crate::core::{Lobby, RoomManager, UserId};
 use crate::protocol::{PacketClient, PacketServer};
 use log::{info, trace, warn};
 use std::time::{Duration, Instant};
@@ -10,10 +10,11 @@ use std::time::{Duration, Instant};
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
-struct WsSession {
+pub struct WsSession {
     id: UserId,
     last_heartbeat: Instant,
-    server: Addr<Server>,
+    lobby: Addr<Lobby>,
+    room_manager: Addr<RoomManager>,
 }
 
 impl Actor for WsSession {
@@ -83,7 +84,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             ws::Message::Text(text) => {
                 trace!("{}", &text);
                 if let Ok(message) = serde_json::from_str::<PacketClient>(&text) {
-                    self.server.do_send(message);
+                    Handler::handle(self, message, ctx);
                 }
             }
             ws::Message::Nop | ws::Message::Continuation(_) => {}
@@ -110,13 +111,15 @@ impl WsSession {
 pub async fn ws(
     req: HttpRequest,
     stream: web::Payload,
-    server: web::Data<Addr<Server>>,
+    room_manager: web::Data<Addr<RoomManager>>,
+    lobby: web::Data<Addr<Lobby>>,
 ) -> Result<HttpResponse, Error> {
     ws::start(
         WsSession {
             id: 0,
             last_heartbeat: Instant::now(),
-            server: server.as_ref().clone(),
+            lobby: lobby.as_ref().clone(),
+            room_manager: room_manager.as_ref().clone(),
         },
         &req,
         stream,

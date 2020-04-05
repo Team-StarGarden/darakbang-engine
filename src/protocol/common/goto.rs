@@ -1,6 +1,6 @@
-use crate::core::Server;
 use crate::protocol::PacketResult;
-use actix::prelude::*;
+use crate::websocket::WsSession;
+use actix::{Handler, Message, MessageResponse};
 use log::info;
 use serde::*;
 
@@ -23,7 +23,7 @@ pub struct GotoPacketResponseOk {}
 
 pub type GotoPacketResponse = PacketResult<GotoPacketResponseOk, GotoPacketResponseError>;
 
-impl Handler<GotoPacketRequest> for Server {
+impl Handler<GotoPacketRequest> for WsSession {
     type Result = GotoPacketResponse;
 
     fn handle(&mut self, message: GotoPacketRequest, context: &mut Self::Context) -> Self::Result {

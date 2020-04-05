@@ -1,6 +1,6 @@
-use crate::core::Server;
 use crate::protocol::*;
-use actix::prelude::*;
+use crate::websocket::WsSession;
+use actix::{Handler, Message, MessageResponse};
 use serde::*;
 
 #[derive(Debug, Serialize, MessageResponse)]
@@ -23,7 +23,7 @@ impl Message for PacketClient {
     type Result = PacketServer;
 }
 
-impl Handler<PacketClient> for Server {
+impl Handler<PacketClient> for WsSession {
     type Result = PacketServer;
 
     fn handle(&mut self, msg: PacketClient, ctx: &mut Self::Context) -> Self::Result {

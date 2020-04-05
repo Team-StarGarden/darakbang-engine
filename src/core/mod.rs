@@ -1,9 +1,11 @@
+mod lobby;
 mod room;
-mod server;
+mod room_manager;
 mod session;
 
+pub use lobby::*;
 pub use room::*;
-pub use server::*;
+pub use room_manager::*;
 pub use session::*;
 
 pub type UserId = usize;
