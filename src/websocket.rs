@@ -74,7 +74,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
                 self.last_heartbeat = Instant::now();
             }
             ws::Message::Binary(_) => {
-                trace!("Unexpected binary data accepted from {}", self.id);
+                trace!("Unexpected binary data received from {}", self.id);
             }
 
             ws::Message::Close(_) => {
