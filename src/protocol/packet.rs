@@ -1,36 +1,9 @@
+use crate::core::Server;
 use crate::protocol::structure::*;
-use actix::Message;
+use actix::prelude::*;
 use serde::*;
-use std::fmt;
 
-#[derive(Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum PacketResult<OkBody: Serialize, ErrorKind: Serialize> {
-    Ok(OkBody),
-    Err {
-        kind: ErrorKind,
-        description: Option<String>,
-    },
-}
-
-impl<OkBody, ErrorKind> fmt::Debug for PacketResult<OkBody, ErrorKind>
-where
-    OkBody: Serialize + fmt::Debug,
-    ErrorKind: Serialize + fmt::Debug,
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PacketResult::Ok(body) => f.debug_tuple("PacketResult::Ok").field(body).finish(),
-            PacketResult::Err { kind, description } => f
-                .debug_struct("PacketResult::Err")
-                .field("kind", kind)
-                .field("description", description)
-                .finish(),
-        }
-    }
-}
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, MessageResponse)]
 #[serde(untagged)]
 pub enum PacketServer {
     Common(CommonPacketServer),
@@ -47,5 +20,15 @@ pub enum PacketClient {
 }
 
 impl Message for PacketClient {
-    type Result = ();
+    type Result = PacketServer;
+}
+
+impl Handler<PacketClient> for Server {
+    type Result = PacketServer;
+
+    fn handle(&mut self, msg: PacketClient, ctx: &mut Self::Context) -> Self::Result {
+        match msg {
+            PacketClient::Common(common) => PacketServer::Common(self.handle(common, ctx)),
+        }
+    }
 }

@@ -1,8 +1,12 @@
+use crate::core::Server;
+use actix::prelude::*;
 use packet_macro::packet;
 
 mod goto;
 
-#[packet(namespace = "common")]
+pub use goto::*;
+
+#[packet(namespace = "common", handler_target = "Server")]
 #[derive(Debug)]
 pub enum CommonPacket {
     #[packet(id = "goto")]

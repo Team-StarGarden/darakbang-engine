@@ -73,7 +73,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             ws::Message::Pong(_) => {
                 self.last_heartbeat = Instant::now();
             }
-            ws::Message::Binary(_) => warn!("Unexpected Binary Data"),
+            ws::Message::Binary(_) => {
+                trace!("Unexpected binary data accepted from {}", self.id);
+            }
 
             ws::Message::Close(_) => {
                 ctx.stop();
@@ -81,31 +83,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             ws::Message::Text(text) => {
                 trace!("{}", &text);
                 if let Ok(message) = serde_json::from_str::<PacketClient>(&text) {
-                    info!("{:?}", message);
-                    // self.server.do_send(message);
-                    /*
-                    match message {
-                        Message::Chat { text, to } => {
-                            self.host.do_send(game::Chat {
-                                id: self.id,
-                                text,
-                                to,
-                            });
-                        }
-                        Message::CreateRoom { room } => {
-                            self.host.do_send(game::CreateRoom { id: self.id, room });
-                        }
-                        Message::GetRoomDetail { room } => {
-                            self.host.do_send(game::GetRoomDetail { id: self.id, room });
-                        }
-                        Message::JoinRoom { room } => {
-                            self.host.do_send(game::JoinRoom { id: self.id, room });
-                        }
-                        Message::QuitRoom => {
-                            self.host.do_send(game::QuitRoom { id: self.id });
-                        }
-                    }
-                    */
+                    self.server.do_send(message);
                 }
             }
             ws::Message::Nop | ws::Message::Continuation(_) => {}
