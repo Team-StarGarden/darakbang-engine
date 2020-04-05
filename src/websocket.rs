@@ -2,7 +2,7 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use crate::core::{Lobby, RoomManager, UserId};
+use crate::core::{Lobby, RoomId, RoomManager, UserId};
 use crate::protocol::{PacketClient, PacketServer};
 use log::{info, trace, warn};
 use std::time::{Duration, Instant};
@@ -15,6 +15,8 @@ pub struct WsSession {
     last_heartbeat: Instant,
     lobby: Addr<Lobby>,
     room_manager: Addr<RoomManager>,
+    room: Option<RoomId>,
+    name: String,
 }
 
 impl Actor for WsSession {
@@ -115,11 +117,14 @@ pub async fn ws(
     lobby: web::Data<Addr<Lobby>>,
 ) -> Result<HttpResponse, Error> {
     ws::start(
+        // TODO: WsSession을 초기화할 때 적절한 id 및 name 값으로 초기화해야 함.
         WsSession {
             id: 0,
             last_heartbeat: Instant::now(),
             lobby: lobby.as_ref().clone(),
             room_manager: room_manager.as_ref().clone(),
+            room: None,
+            name: "".to_owned(),
         },
         &req,
         stream,
