@@ -100,6 +100,8 @@ struct TokenClaims {
 }
 
 use thiserror::Error;
+use crate::config;
+use crate::config::Config;
 
 #[derive(Error, Debug)]
 pub enum UserError {
@@ -114,6 +116,7 @@ pub fn auth_local_user(
     user_name: &str,
     password: &str,
 ) -> Result<String, UserError> {
+    let config: Config = config::Config::load().expect("Invalid configuration detected");
     let user: User = match find_local_user(conn, user_name, password) {
         Ok(Some(user)) => user,
         _ => Err(UserError::NotFound)?,
@@ -121,12 +124,12 @@ pub fn auth_local_user(
     let claim = TokenClaims {
         exp: Utc::now().timestamp() as usize,
         iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
-        iss: "darakbang".to_string(),
+        iss: config.jwt_issuer.clone(),
         sub: user.uid,
     };
     encode(
         &Header::default(),
         &claim,
-        &EncodingKey::from_secret("asdf".as_ref()),
+        &EncodingKey::from_secret(config.jwt_secret.as_ref()),
     ).map_err(|e| UserError::Authentication)
 }
