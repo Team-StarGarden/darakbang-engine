@@ -103,40 +103,22 @@ pub fn auth_local_user(
     conn: &MysqlConnection,
     user_name: &str,
     password: &str,
-) -> QueryResult<Option<String>> {
-    use crate::database::schema::user::dsl::{self, user};
-    use zeroize::Zeroizing;
-    let salt: Zeroizing<_> = user
-        .filter(dsl::user_name.eq(user_name))
-        .select(dsl::salt)
-        .first::<Option<String>>(conn)
-        .optional()?
-        .flatten()
-        .into();
-
-    if let Some(salt) = salt.as_ref() {
-        let password_hash = Zeroizing::new(argon2rs::argon2i_simple(password, salt));
-        let result: Option<User> = user
-            .filter(dsl::user_name.eq(user_name))
-            .filter(dsl::salt.eq(salt))
-            .filter(dsl::password.eq(Some(password_hash.as_ref())))
-            .select((dsl::uid, dsl::service_name, dsl::user_name, dsl::point))
-            .first(conn)
-            .optional()?;
-        let uid = result.unwrap().uid;
-        let claim = TokenClaims {
-            exp: Utc::now().timestamp() as usize,
-            iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
-            iss: "darakbang".to_string(),
-            sub: uid,
-        };
-        let token = encode(
-            &Header::default(),
-            &claim,
-            &EncodingKey::from_secret("asdf".as_ref()),
-        ).expect("");
-        Ok(Option::from(token))
-    } else {
-        Ok(None)
+) -> Option<String> {
+    let user = find_local_user(conn, user_name, password).unwrap();
+    match user {
+        Some(user) => {
+            let claim = TokenClaims {
+                exp: Utc::now().timestamp() as usize,
+                iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+                iss: "darakbang".to_string(),
+                sub: user.uid,
+            };
+            Some(encode(
+                &Header::default(),
+                &claim,
+                &EncodingKey::from_secret("asdf".as_ref()),
+            ).unwrap())
+        }
+        None => None,
     }
 }

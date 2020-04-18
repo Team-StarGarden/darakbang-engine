@@ -49,6 +49,6 @@ impl Query {
             .get()
             .map_err(|e| error!("Database connection failed: {}", e))
             .ok()?;
-        auth_local_user(&conn, &user_name, &password).expect("Login Failed")
+        auth_local_user(&conn, &user_name, &password)
     }
 }
