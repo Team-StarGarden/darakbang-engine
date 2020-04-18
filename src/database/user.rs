@@ -99,26 +99,34 @@ struct TokenClaims {
     sub: String,
 }
 
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum UserError {
+    #[error("User not found")]
+    NotFound,
+    #[error("Authentication error")]
+    Authentication,
+}
+
 pub fn auth_local_user(
     conn: &MysqlConnection,
     user_name: &str,
     password: &str,
-) -> Option<String> {
-    let user = find_local_user(conn, user_name, password).unwrap();
-    match user {
-        Some(user) => {
-            let claim = TokenClaims {
-                exp: Utc::now().timestamp() as usize,
-                iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
-                iss: "darakbang".to_string(),
-                sub: user.uid,
-            };
-            Some(encode(
-                &Header::default(),
-                &claim,
-                &EncodingKey::from_secret("asdf".as_ref()),
-            ).unwrap())
-        }
-        None => None,
-    }
+) -> Result<String, UserError> {
+    let user: User = match find_local_user(conn, user_name, password) {
+        Ok(Some(user)) => user,
+        _ => Err(UserError::NotFound)?,
+    };
+    let claim = TokenClaims {
+        exp: Utc::now().timestamp() as usize,
+        iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+        iss: "darakbang".to_string(),
+        sub: user.uid,
+    };
+    encode(
+        &Header::default(),
+        &claim,
+        &EncodingKey::from_secret("asdf".as_ref()),
+    ).map_err(|e| UserError::Authentication)
 }
