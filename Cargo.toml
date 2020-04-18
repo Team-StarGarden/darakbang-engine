@@ -25,3 +25,4 @@ packet-macro = { path = "./packet-macro" }
 argon2rs = "0.2.5"
 zeroize = "1.1.0"
 rand = "0.7.3"
+jsonwebtoken = "7.1.0"

@@ -4,12 +4,13 @@ use diesel::result::QueryResult;
 
 use crate::database::model::{NewUser, User};
 use crate::diesel::RunQueryDsl;
+use std::error::Error;
 
 pub fn get_all_users(
     conn: &MysqlConnection,
 ) -> QueryResult<Vec<User>> {
     use crate::database::schema::user::dsl::*;
-    
+
     user.select((uid, service_name, user_name, point)).load(conn)
 }
 
@@ -79,6 +80,36 @@ pub fn find_local_user(
             .first(conn)
             .optional()?;
         Ok(result)
+    } else {
+        Ok(None)
+    }
+}
+
+pub fn auth_local_user(
+    conn: &MysqlConnection,
+    user_name: &str,
+    password: &str,
+) -> QueryResult<Option<String>> {
+    use crate::database::schema::user::dsl::{self, user};
+    use zeroize::Zeroizing;
+    let salt: Zeroizing<_> = user
+        .filter(dsl::user_name.eq(user_name))
+        .select(dsl::salt)
+        .first::<Option<String>>(conn)
+        .optional()?
+        .flatten()
+        .into();
+
+    if let Some(salt) = salt.as_ref() {
+        let password_hash = Zeroizing::new(argon2rs::argon2i_simple(password, salt));
+        let result:Option<User> = user
+            .filter(dsl::user_name.eq(user_name))
+            .filter(dsl::salt.eq(salt))
+            .filter(dsl::password.eq(Some(password_hash.as_ref())))
+            .first(conn)
+            .optional()?;
+        let user_name = result.unwrap().user_name;
+        Ok(Option::from(user_name))
     } else {
         Ok(None)
     }
