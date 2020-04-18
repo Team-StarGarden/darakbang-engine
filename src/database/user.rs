@@ -5,6 +5,10 @@ use diesel::result::QueryResult;
 use crate::database::model::{NewUser, User};
 use crate::diesel::RunQueryDsl;
 use std::error::Error;
+use jsonwebtoken::{encode, Header, EncodingKey};
+use chrono::{DateTime, Utc, Duration};
+use juniper::parser::Token;
+use std::ops::Add;
 
 pub fn get_all_users(
     conn: &MysqlConnection,
@@ -85,6 +89,16 @@ pub fn find_local_user(
     }
 }
 
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+struct TokenClaims {
+    exp: usize,
+    iat: usize,
+    iss: String,
+    sub: String,
+}
+
 pub fn auth_local_user(
     conn: &MysqlConnection,
     user_name: &str,
@@ -102,14 +116,26 @@ pub fn auth_local_user(
 
     if let Some(salt) = salt.as_ref() {
         let password_hash = Zeroizing::new(argon2rs::argon2i_simple(password, salt));
-        let result:Option<User> = user
+        let result: Option<User> = user
             .filter(dsl::user_name.eq(user_name))
             .filter(dsl::salt.eq(salt))
             .filter(dsl::password.eq(Some(password_hash.as_ref())))
+            .select((dsl::uid, dsl::service_name, dsl::user_name, dsl::point))
             .first(conn)
             .optional()?;
-        let user_name = result.unwrap().user_name;
-        Ok(Option::from(user_name))
+        let uid = result.unwrap().uid;
+        let claim = TokenClaims {
+            exp: Utc::now().timestamp() as usize,
+            iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+            iss: "darakbang".to_string(),
+            sub: uid,
+        };
+        let token = encode(
+            &Header::default(),
+            &claim,
+            &EncodingKey::from_secret("asdf".as_ref()),
+        ).expect("");
+        Ok(Option::from(token))
     } else {
         Ok(None)
     }
