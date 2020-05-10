@@ -5,7 +5,7 @@ use diesel::result::QueryResult;
 use crate::database::model::{NewUser, User};
 use crate::diesel::RunQueryDsl;
 use std::error::Error;
-use jsonwebtoken::{encode, Header, EncodingKey};
+use jsonwebtoken::{encode, Header, EncodingKey, decode, Validation, Algorithm, DecodingKey, TokenData};
 use chrono::{DateTime, Utc, Duration};
 use juniper::parser::Token;
 use std::ops::Add;
@@ -92,7 +92,7 @@ pub fn find_local_user(
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
-struct TokenClaims {
+pub struct TokenClaims {
     exp: usize,
     iat: usize,
     iss: String,
@@ -132,4 +132,17 @@ pub fn auth_local_user(
         &claim,
         &EncodingKey::from_secret(config.jwt_secret.as_ref()),
     ).map_err(|e| UserError::Authentication)
+}
+
+pub fn auth_token(
+    conn: &MysqlConnection,
+    token: &str,
+) -> Result<TokenClaims, UserError> {
+    let config: Config = config::Config::load().expect("Invalid configuration detected");
+    let token_data = decode::<TokenClaims>(
+        &token,
+        &DecodingKey::from_secret(config.jwt_secret.as_ref()),
+        &Validation::default(),
+    ).map_err(|e| UserError::Authentication)?;
+    Ok(token_data.claims)
 }
