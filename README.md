@@ -47,5 +47,7 @@ CREATE DATABASE darakbang CHARSET utf8mb4;
 단어 데이터를 임포트 합니다.
 
 ```shell script
-mysql -u (DB 사용자) -p darakbang < ./dump.sql
+# On macOS, Linux and PowerShell
+wget https://cdn.star.garden/res/darakbang-words.sql
+mysql -u (DB 사용자) -p darakbang < ./darakbang-words.sql
 ```
