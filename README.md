@@ -42,6 +42,14 @@ utf8mb4로 생성된 DB를 생성합니다.
 CREATE DATABASE darakbang CHARSET utf8mb4;
 ```
 
+## Create tables
+
+```shell script
+# Install Diesel CLI.
+cargo install diesel_cli --no-default-features --features mysql
+diesel migration run
+```
+
 ## Import words
 
 단어 데이터를 임포트 합니다.
