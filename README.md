@@ -49,5 +49,6 @@ CREATE DATABASE darakbang CHARSET utf8mb4;
 ```shell script
 # On macOS, Linux and PowerShell
 wget https://cdn.star.garden/res/darakbang-words.sql
-mysql -u (DB 사용자) -p darakbang < ./darakbang-words.sql
+mysql -u (DB 사용자) -p darakbang
+source darakbang-words.sql
 ```
