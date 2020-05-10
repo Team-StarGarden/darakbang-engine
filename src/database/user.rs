@@ -122,8 +122,8 @@ pub fn auth_local_user(
         _ => Err(UserError::NotFound)?,
     };
     let claim = TokenClaims {
-        exp: Utc::now().timestamp() as usize,
-        iat: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+        exp: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+        iat: Utc::now().timestamp() as usize,
         iss: config.jwt_issuer.clone(),
         sub: user.uid,
     };
