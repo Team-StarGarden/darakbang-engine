@@ -4,12 +4,17 @@ use diesel::result::QueryResult;
 
 use crate::database::model::{NewUser, User};
 use crate::diesel::RunQueryDsl;
+use std::error::Error;
+use jsonwebtoken::{encode, Header, EncodingKey, decode, Validation, Algorithm, DecodingKey, TokenData};
+use chrono::{DateTime, Utc, Duration};
+use juniper::parser::Token;
+use std::ops::Add;
 
 pub fn get_all_users(
     conn: &MysqlConnection,
 ) -> QueryResult<Vec<User>> {
     use crate::database::schema::user::dsl::*;
-    
+
     user.select((uid, service_name, user_name, point)).load(conn)
 }
 
@@ -82,4 +87,62 @@ pub fn find_local_user(
     } else {
         Ok(None)
     }
+}
+
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct TokenClaims {
+    exp: usize,
+    iat: usize,
+    iss: String,
+    sub: String,
+}
+
+use thiserror::Error;
+use crate::config;
+use crate::config::Config;
+
+#[derive(Error, Debug)]
+pub enum UserError {
+    #[error("User not found")]
+    NotFound,
+    #[error("Authentication error")]
+    Authentication,
+}
+
+pub fn auth_local_user(
+    conn: &MysqlConnection,
+    user_name: &str,
+    password: &str,
+) -> Result<String, UserError> {
+    let config: Config = config::Config::load().expect("Invalid configuration detected");
+    let user: User = match find_local_user(conn, user_name, password) {
+        Ok(Some(user)) => user,
+        _ => Err(UserError::NotFound)?,
+    };
+    let claim = TokenClaims {
+        exp: Utc::now().add(Duration::weeks(1)).timestamp() as usize,
+        iat: Utc::now().timestamp() as usize,
+        iss: config.jwt_issuer.clone(),
+        sub: user.uid,
+    };
+    encode(
+        &Header::default(),
+        &claim,
+        &EncodingKey::from_secret(config.jwt_secret.as_ref()),
+    ).map_err(|e| UserError::Authentication)
+}
+
+pub fn auth_token(
+    conn: &MysqlConnection,
+    token: &str,
+) -> Result<TokenClaims, UserError> {
+    let config: Config = config::Config::load().expect("Invalid configuration detected");
+    let token_data = decode::<TokenClaims>(
+        &token,
+        &DecodingKey::from_secret(config.jwt_secret.as_ref()),
+        &Validation::default(),
+    ).map_err(|e| UserError::Authentication)?;
+    Ok(token_data.claims)
 }

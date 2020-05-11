@@ -2,6 +2,8 @@ use crate::gql::Context;
 use crate::gql::schema::User;
 
 use log::error;
+use chrono::{DateTime, Utc};
+use crate::database::user::{auth_local_user, auth_token};
 
 pub struct Query;
 
@@ -40,5 +42,24 @@ impl Query {
             .ok()
             .flatten()
             .map(User::from_database)
+    }
+
+    fn token_local_user(context: &Context, user_name: String, password: String) -> Option<String> {
+        let conn = context.database_pool
+            .get()
+            .map_err(|e| error!("Database connection failed: {}", e))
+            .ok()?;
+        auth_local_user(&conn, &user_name, &password).ok()
+    }
+
+    fn token_valid(context: &Context, token: String) -> Option<bool> {
+        let conn = context.database_pool
+            .get()
+            .map_err(|e| error!("Database connection failed: {}", e))
+            .ok()?;
+        match auth_token(&conn, &token).ok() {
+            Some(_) => Some(true),
+            _ => Some(false),
+        }
     }
 }
