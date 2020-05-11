@@ -16,7 +16,7 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
             out.finish(format_args!(
                 "{time} {level} {target} {arrow} {message}",
                 time = Local::now()
-                    .format("%+\t")
+                    .format("%F\t%T%.3f%Z\t")
                     .to_string()
                     .bright_black(),
                 level = {
