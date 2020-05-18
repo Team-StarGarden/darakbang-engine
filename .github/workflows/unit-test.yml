@@ -2,8 +2,8 @@ name: Rust Unit Test
 
 on:
   push:
-    branches:
-      - '!master'
+    branches-ignore:
+      - 'master'
 
 jobs:
   test:
