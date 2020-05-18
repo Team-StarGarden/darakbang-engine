@@ -3,9 +3,7 @@ name: Rust Unit Test
 on:
   push:
     branches:
-      - 'fix/**'
-      - 'test/**'
-      - 'feature/**'
+      - '!master'
 
 jobs:
   test:
