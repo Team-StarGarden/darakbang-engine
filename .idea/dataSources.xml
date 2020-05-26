@@ -4,6 +4,7 @@
     <data-source source="LOCAL" name="darakbang-dev" uuid="cce0d5cc-68f1-4b97-a779-b383d92a71bc">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mariadb://localhost:3306/darakbang</jdbc-url>
     </data-source>

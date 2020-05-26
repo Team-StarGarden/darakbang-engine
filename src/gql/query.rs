@@ -3,7 +3,7 @@ use crate::gql::schema::User;
 
 use log::error;
 use chrono::{DateTime, Utc};
-use crate::database::user::{auth_local_user, auth_token};
+use crate::database::user::token::{local,decode};
 
 pub struct Query;
 
@@ -49,7 +49,7 @@ impl Query {
             .get()
             .map_err(|e| error!("Database connection failed: {}", e))
             .ok()?;
-        auth_local_user(&conn, &user_name, &password).ok()
+        local::auth(&conn, &user_name, &password).ok()
     }
 
     fn token_valid(context: &Context, token: String) -> Option<bool> {
@@ -57,7 +57,7 @@ impl Query {
             .get()
             .map_err(|e| error!("Database connection failed: {}", e))
             .ok()?;
-        match auth_token(&conn, &token).ok() {
+        match decode(&conn, &token).ok() {
             Some(_) => Some(true),
             _ => Some(false),
         }
