@@ -1,9 +1,10 @@
 use diesel::MysqlConnection;
-use crate::database::user::token::TokenClaims;
-use crate::config;
 use jsonwebtoken::{DecodingKey, Validation};
+
+use crate::config;
 use crate::config::Config;
-use crate::database::user::token::error::UserAuthError;
+use crate::database::user::auth::error::UserAuthError;
+use crate::database::user::auth::TokenClaims;
 
 pub fn decode(
     conn: &MysqlConnection,

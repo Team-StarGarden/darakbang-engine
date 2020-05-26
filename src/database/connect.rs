@@ -1,5 +1,5 @@
 use diesel::mysql::MysqlConnection;
-use diesel::r2d2::{Pool, PooledConnection, ConnectionManager, PoolError};
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection, PoolError};
 
 use crate::config;
 
