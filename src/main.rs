@@ -5,9 +5,9 @@ use std::io;
 use std::sync::Arc;
 
 use actix_rt;
+use actix_web::{App, dev, Error, http, HttpResponse, HttpServer, middleware, Responder, web};
 use actix_web::middleware::errhandlers::ErrorHandlers;
-use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
-use juniper::http::{playground::playground_source, GraphQLRequest};
+use juniper::http::{GraphQLRequest, playground::playground_source};
 use middleware::errhandlers::ErrorHandlerResponse;
 
 use crate::gql::{Context, Mutation, Query, Schema};
@@ -37,7 +37,7 @@ async fn graphql(
         let res = data.execute(&schema, &context);
         Ok::<_, serde_json::error::Error>(serde_json::to_string(&res)?)
     })
-    .await?;
+        .await?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(user))
@@ -75,7 +75,7 @@ async fn main() -> io::Result<()> {
             .service(web::resource("/").route(web::get().to(playground)))
             .service(web::resource("/ws").to(websocket::ws))
     })
-    .bind(&configuration.bind_address)?
-    .run()
-    .await
+        .bind(&configuration.bind_address)?
+        .run()
+        .await
 }

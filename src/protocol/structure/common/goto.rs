@@ -1,5 +1,6 @@
-use crate::protocol::PacketResult;
 use serde::*;
+
+use crate::protocol::PacketResult;
 
 #[derive(Serialize, Deserialize)]
 pub struct GotoPacketRequest {

@@ -1,6 +1,8 @@
-use crate::protocol::structure::*;
 use actix::Message;
 use serde::*;
+
+use crate::protocol::structure::*;
+
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum PacketResult<OkBody: Serialize, ErrorKind: Serialize> {
