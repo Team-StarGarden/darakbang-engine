@@ -2,8 +2,7 @@ use chrono::{DateTime, Utc};
 use log::error;
 
 use crate::database::user::{auth, local};
-use crate::gql::Context;
-use crate::gql::schema::User;
+use crate::gql::{Context, schema::User};
 
 pub struct Query;
 
@@ -36,7 +35,7 @@ impl Query {
             .map_err(|e| error!("Database connection failed: {}", e))
             .ok()?;
         let password = Zeroizing::new(password);
-        local::find_local_user(&conn, &user_name, &password)
+        local::find(&conn, &user_name, &password)
             .map_err(|e| error!("Failed to find local user: {}", e))
             .ok()
             .flatten()

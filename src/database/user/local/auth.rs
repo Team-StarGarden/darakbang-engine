@@ -14,7 +14,7 @@ pub fn auth(
     password: &str,
 ) -> Result<String, auth::error::UserAuthError> {
     let config: config::Config = config::Config::load().expect("Invalid configuration detected");
-    let user: User = match local::find_local_user(conn, user_name, password) {
+    let user: User = match local::find(conn, user_name, password) {
         Ok(Some(user)) => user,
         _ => Err(auth::error::UserAuthError::NotFound)?,
     };
