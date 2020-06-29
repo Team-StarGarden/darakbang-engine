@@ -19,7 +19,7 @@ impl Mutation {
     fn create_local_user(context: &Context, new_user: CreateLocalUser) -> Option<User> {
         use crate::database::user::create_local_user;
         use zeroize::Zeroizing;
-        
+
         let conn = context.database_pool
             .get()
             .map_err(|e| error!("Database connection failed: {}", e))

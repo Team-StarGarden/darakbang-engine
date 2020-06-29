@@ -1,13 +1,15 @@
 #[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate diesel_migrations;
 
 use std::io;
 use std::sync::Arc;
 
 use actix_rt;
+use actix_web::{App, dev, Error, http, HttpResponse, HttpServer, middleware, Responder, web};
 use actix_web::middleware::errhandlers::ErrorHandlers;
-use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
-use juniper::http::{playground::playground_source, GraphQLRequest};
+use juniper::http::{GraphQLRequest, playground::playground_source};
 use middleware::errhandlers::ErrorHandlerResponse;
 
 use crate::gql::{Context, Mutation, Query, Schema};
@@ -23,8 +25,8 @@ mod websocket;
 async fn playground() -> impl Responder {
     let html = playground_source("/graphql");
     HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(html)
+    .content_type("text/html; charset=utf-8")
+    .body(html)
 }
 
 /// GraphQL handler
@@ -39,8 +41,8 @@ async fn graphql(
     })
     .await?;
     Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(user))
+    .content_type("application/json")
+    .body(user))
 }
 
 fn render_404<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerResponse<B>, Error> {
@@ -52,12 +54,20 @@ fn render_404<B>(mut res: dev::ServiceResponse<B>) -> Result<ErrorHandlerRespons
     Ok(ErrorHandlerResponse::Response(res))
 }
 
+embed_migrations!();
+
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     let configuration = config::Config::load().expect("Invalid configuration detected");
 
-    let pool = database::establish_connection(&configuration.database)
-        .expect("Invalid database configuration detected");
+    let connection = database::establish_connection(&configuration.database)
+    .expect("Invalid database configuration detected");
+
+    embedded_migrations::run(&connection)
+    .expect("Migration Error");
+
+    let pool = database::establish_connection_pool(&configuration.database)
+    .expect("Invalid database configuration detected");
 
     log::setup_logger().expect("Logger setup failed");
 
@@ -66,14 +76,14 @@ async fn main() -> io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(schema.clone())
-            .data(context.clone())
-            .wrap(middleware::Logger::default())
-            .wrap(ErrorHandlers::new().handler(http::StatusCode::NOT_FOUND, render_404))
-            .service(web::resource("/graphql").route(web::post().to(graphql)))
-            .service(web::resource("/graphql").route(web::get().to(graphql)))
-            .service(web::resource("/").route(web::get().to(playground)))
-            .service(web::resource("/ws").to(websocket::ws))
+        .data(schema.clone())
+        .data(context.clone())
+        .wrap(middleware::Logger::default())
+        .wrap(ErrorHandlers::new().handler(http::StatusCode::NOT_FOUND, render_404))
+        .service(web::resource("/graphql").route(web::post().to(graphql)))
+        .service(web::resource("/graphql").route(web::get().to(graphql)))
+        .service(web::resource("/").route(web::get().to(playground)))
+        .service(web::resource("/ws").to(websocket::ws))
     })
     .bind(&configuration.bind_address)?
     .run()

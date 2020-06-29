@@ -42,6 +42,9 @@ table! {
     }
 }
 
+joinable!(original_language_word -> word (word_id));
+joinable!(region_word -> word (word_id));
+
 allow_tables_to_appear_in_same_query!(
     original_language_word,
     region_word,
