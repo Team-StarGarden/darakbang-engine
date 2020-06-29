@@ -1,4 +1,4 @@
-pub use connect::{establish_connection, MysqlPool, MysqlPooledConnection};
+pub use connect::{establish_connection, establish_connection_pool, MysqlPool, MysqlPooledConnection};
 
 mod connect;
 pub mod model;
