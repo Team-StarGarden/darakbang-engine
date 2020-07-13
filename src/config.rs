@@ -58,7 +58,9 @@ impl Config {
 
         let database = Database::from_env()?;
 
-        let bind_address = var("BIND_ADDRESS").unwrap_or("0.0.0.0:8080".to_owned());
+        let port = var("PORT").unwrap_or(String::from("8080"));
+
+        let bind_address = var("BIND_ADDRESS").unwrap_or(format!("0.0.0.0:{}", port));
 
         let jwt_issuer = var("JWT_ISSUER").unwrap_or("darakbang".to_owned());
 
@@ -66,9 +68,9 @@ impl Config {
         use rand::Rng;
         use rand::distributions::Alphanumeric;
         let jwt_secret = var("JWT_SECRET").unwrap_or(thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(30)
-            .collect()
+        .sample_iter(&Alphanumeric)
+        .take(30)
+        .collect()
         );
 
         Ok(Self {
