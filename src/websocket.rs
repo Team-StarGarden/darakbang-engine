@@ -2,20 +2,21 @@ use actix::*;
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
+use crate::core::{Lobby, RoomId, RoomManager, UserId};
 use crate::protocol::{PacketClient, PacketServer};
-use log::{info, warn};
+use log::{info, trace, warn};
 use std::time::{Duration, Instant};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
-type UserId = usize;
-type Message = Vec<u8>;
-
-struct WsSession {
+pub struct WsSession {
     id: UserId,
     last_heartbeat: Instant,
-    // host: Addr<game::Host>,
+    lobby: Addr<Lobby>,
+    room_manager: Addr<RoomManager>,
+    room: Option<RoomId>,
+    name: String,
 }
 
 impl Actor for WsSession {
@@ -75,42 +76,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             ws::Message::Pong(_) => {
                 self.last_heartbeat = Instant::now();
             }
-            ws::Message::Binary(_) => warn!("Unexpected Binary Data"),
+            ws::Message::Binary(_) => {
+                trace!("Unexpected binary data received from {}", self.id);
+            }
 
             ws::Message::Close(_) => {
                 ctx.stop();
             }
             ws::Message::Text(text) => {
-                if let Ok(message) = serde_json::from_str::<Message>(&text) {
-                    /*
-                    match message {
-                        Message::Chat { text, to } => {
-                            self.host.do_send(game::Chat {
-                                id: self.id,
-                                text,
-                                to,
-                            });
-                        }
-                        Message::CreateRoom { room } => {
-                            self.host.do_send(game::CreateRoom { id: self.id, room });
-                        }
-                        Message::GetRoomDetail { room } => {
-                            self.host.do_send(game::GetRoomDetail { id: self.id, room });
-                        }
-                        Message::JoinRoom { room } => {
-                            self.host.do_send(game::JoinRoom { id: self.id, room });
-                        }
-                        Message::QuitRoom => {
-                            self.host.do_send(game::QuitRoom { id: self.id });
-                        }
-                    }
-                    */
+                trace!("{}", &text);
+                if let Ok(message) = serde_json::from_str::<PacketClient>(&text) {
+                    Handler::handle(self, message, ctx);
                 }
             }
-            ws::Message::Nop => (),
-            ws::Message::Continuation(_) => {
-                // wtf is that
-            }
+            ws::Message::Nop | ws::Message::Continuation(_) => {}
         }
     }
 }
@@ -134,13 +113,18 @@ impl WsSession {
 pub async fn ws(
     req: HttpRequest,
     stream: web::Payload,
-    // server: web::Data<Addr<game::Host>>,
+    room_manager: web::Data<Addr<RoomManager>>,
+    lobby: web::Data<Addr<Lobby>>,
 ) -> Result<HttpResponse, Error> {
     ws::start(
+        // TODO: WsSession을 초기화할 때 적절한 id 및 name 값으로 초기화해야 함.
         WsSession {
             id: 0,
             last_heartbeat: Instant::now(),
-            // host: server.get_ref().clone(),
+            lobby: lobby.as_ref().clone(),
+            room_manager: room_manager.as_ref().clone(),
+            room: None,
+            name: "".to_owned(),
         },
         &req,
         stream,

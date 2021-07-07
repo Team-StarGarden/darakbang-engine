@@ -1,5 +1,9 @@
-mod handler;
+mod common;
 mod packet;
-mod structure;
+mod result;
+mod wordchain;
 
-pub use packet::{PacketClient, PacketResult, PacketServer};
+pub use common::*;
+pub use packet::{PacketClient, PacketServer};
+pub use result::PacketResult;
+pub use wordchain::*;

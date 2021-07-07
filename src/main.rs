@@ -4,15 +4,18 @@ extern crate diesel;
 use std::io;
 use std::sync::Arc;
 
+use actix::prelude::*;
 use actix_rt;
 use actix_web::middleware::errhandlers::ErrorHandlers;
 use actix_web::{dev, http, middleware, web, App, Error, HttpResponse, HttpServer, Responder};
 use juniper::http::{playground::playground_source, GraphQLRequest};
 use middleware::errhandlers::ErrorHandlerResponse;
 
+use crate::core::{Lobby, RoomManager};
 use crate::gql::{Context, Mutation, Query, Schema};
 
 mod config;
+mod core;
 mod database;
 mod gql;
 mod log;
@@ -64,10 +67,15 @@ async fn main() -> io::Result<()> {
     let context = Arc::new(Context::new(pool));
     let schema = Arc::new(Schema::new(Query, Mutation));
 
+    let room_manager_addr = RoomManager::default().start();
+    let lobby_addr = Lobby::default().start();
+
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
             .data(context.clone())
+            .data(room_manager_addr.clone())
+            .data(lobby_addr.clone())
             .wrap(middleware::Logger::default())
             .wrap(ErrorHandlers::new().handler(http::StatusCode::NOT_FOUND, render_404))
             .service(web::resource("/graphql").route(web::post().to(graphql)))

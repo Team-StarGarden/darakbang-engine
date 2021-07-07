@@ -7,7 +7,7 @@
 이렇게 적으면
 
 ```rust
-#[packet(namespace = "common")]
+#[packet(namespace = "common", handler_target = "Server")]
 pub enum CommonPacket {
   #[packet(id = "goto")]
   Goto {
@@ -44,5 +44,13 @@ pub enum CommonPacketClient {
   Goto {
     body: GotoRequestBody
   },
+}
+impl Handler<CommonPacketClient> for Server
+{
+    fn handle(&mut self, message: CommonPacketClient, ctx: &mut Self::Context) {
+      match message {
+        Goto { body } => self.handle(body, ctx),
+      }
+    }
 }
 ```
